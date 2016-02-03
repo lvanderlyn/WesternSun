@@ -5,38 +5,64 @@
 	<style>
 	canvas{border: 1px solid black;
 		margin: auto;
-		display: block;}
-		h1{text-align:center;}
+		display: block;
+	}
+		h1{text-align:center;
+		}
+	.fpsmeter {
+        padding: 0;
+        margin: 0;
+        width: 100%;
+        text-align: center;
+    }
+    .fpsmeter p {
+        margin-top: 0px;
+        margin-bottom: 0px;
+    }
 	</style>
 </head>
 <body>
-	<h1> My Awesome Game!</h1>
+	<h1> Western Sun V 0.01</h1>
+	<p><b>Left</b>: "A" or left arrow key. <b>Right</b>: "D" or right arrow key. <b>Jump</b>: "W", space bar or up arrow key. <b>Run</b>: Shift.</p>
 <canvas id="canvas"></canvas>
+<div id="fpscontainer"></div>
 	<script>
 	//Shim do not mess with this part!
 	(function() {
     var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
     window.requestAnimationFrame = requestAnimationFrame;
 })();
+//movement variables
+var regSpeed = 3, //normal speed
+	regMaxSpeed = 3, //normal max speed
+	regJump = 6, //normal jump height
+	regFriction = 0.6, //regular friction (lower is more)
+	runSpeed = 4, //running speed
+	runMaxSpeed = 5, //running max speed
+	runJump = 7, //jump height while running
+	runFriction = .95; //friction while running
 
 var canvas = document.getElementById("canvas"),
 	ctx = canvas.getContext("2d"),
-	width = 900,
+	width = 700,
 	height = 500,
 	player={
-		x : width/2,
-		y : height - 25,
-		width:5,
-		height:25,
-		speed: 3,
+		x : 0,
+		y : height-35,
+		width:25,
+		height:45,
+		maxSpeed: regMaxSpeed,
+		jump: regJump,
+		speed: regSpeed,
 		velX: 0,
 		velY: 0,
 		jumping: false,
 		grounded: false,
+		running: false,
 	},
 	keys = [],
 	boxes = [],
-	friction = 0.8,
+	friction = regFriction,
 	gravity = 0.3;
 
 	canvas.width=width;
@@ -63,31 +89,21 @@ boxes.push({
 	width: 50,
 	height:height,
 });
+
 boxes.push({
-    x: 120,
-    y: 10,
-    width: 80,
-    height: 80
+	x: 45,
+	y: height-60,
+	width: 110,
+	height:10,
 });
+
 boxes.push({
-    x: 270,
-    y: 350,
-    width: 80,
-    height: 20
+	x: 245,
+	y: height-125,
+	width: 210,
+	height:10,
 });
-boxes.push({
-    x: 420,
-    y: 400,
-    width: 80,
-    height: 20
-});
-boxes.push({
-    x: 370,
-    y: 450,
-    width: 80,
-    height: 20
-});
-	// game function
+
 function update(){
 	// key input part
 	if(keys[38] || keys[87] || keys[32]) {
@@ -96,22 +112,27 @@ function update(){
 		if(!player.jumping && player.grounded){
 			player.jumping = true;
 			player.grounded = false;
-			player.velY = -player.speed*2;
-			friction = .95;
+			player.velY = -player.jump;
 		}
 	}
 	if (keys[39] || keys[68]) {
 		//right arrow or d
-		if (player.velX < player.speed) {
-			player.velX++;
+		if (player.velX < player.maxSpeed) {
+			player.velX+= player.speed;
 		}
 	}
 	if (keys [37] || keys[65]) {
 		//left arrow or a
-		if (player.velX > -player.speed) {
-			player.velX--;
+		if (player.velX > -player.maxSpeed) {
+			player.velX-=player.speed;
 		}
 	}
+	if (keys [16]) {
+		//shift to run
+		player.running = true;
+	}
+
+	
 	//add friction and gravity
 	player.velX *= friction;
 	player.velY += gravity;
@@ -123,7 +144,7 @@ function update(){
 	//clear canvas
 	ctx.clearRect(0,0,width,height);
 	//draws the blocks
-	ctx.fillStyle = "black";
+	ctx.fillStyle = "black" //"rgba(0,0,0,0)";
 	ctx.beginPath();
 	//ungrounds the player so they can fall off ledges if there is no collision detected
 	player.grounded = false; 
@@ -137,7 +158,6 @@ function update(){
    		} else if (dir ==="b") {
    			player.grounded = true;
    			player.jumping = false;
-   			friction = 0.8;
    		} else if (dir === "t") {
    			player.velY*= -1;
    		}
@@ -148,10 +168,34 @@ function update(){
 	//move player
 	player.x += player.velX;
 	player.y += player.velY;
+
 	ctx.fill();
+	// debug stuff
+	ctx.font = '10pt Calibri';
+	ctx.fillStyle = 'red';
+	ctx.fillText("velX " +Math.round(player.velX * 100) / 100 , 20, 20);
+	ctx.fillText("velY " +Math.round(player.velY * 100) / 100 , 20, 40);
+	ctx.fillText("friction " +friction, 80, 20);
+	ctx.fillText("running " +player.running, 80, 40);
+	//
 	//draws player
 	ctx.fillStyle="purple";
 	ctx.fillRect(player.x,player.y,player.width,player.height);
+
+	//Shift to Run speed adjustment
+	if (player.running) {
+		player.speed = runSpeed;
+		player.maxSpeed = runMaxSpeed;
+		player.jump = runJump;
+		friction = runFriction;
+		player.running = false;
+	}
+	else {
+		player.speed = regSpeed;
+		player.maxSpeed = regMaxSpeed;
+		player.jump = regJump;
+		friction=regFriction;
+	}
 	//run through loop again
 	requestAnimationFrame(update);
 }
