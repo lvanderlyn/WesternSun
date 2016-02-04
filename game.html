@@ -6,6 +6,8 @@
 	canvas{border: 1px solid black;
 		margin: auto;
 		display: block;
+		background-image: url('http://www.cercocerco.net/media/k2/items/cache/6ef598b10d1539793d4ace8d8b7b613f_XL.jpg');
+		background-position: left center;
 	}
 		h1{text-align:center;
 		}
@@ -35,12 +37,12 @@
 //movement variables
 var regSpeed = 3, //normal speed
 	regMaxSpeed = 3, //normal max speed
-	regJump = 6, //normal jump height
+	regJump = 7, //normal jump height
 	regFriction = 0.6, //regular friction (lower is more)
 	runSpeed = 4, //running speed
 	runMaxSpeed = 5, //running max speed
-	runJump = 7, //jump height while running
-	runFriction = .95; //friction while running
+	runJump = 9, //jump height while running
+	runFriction = 1 //friction while running
 
 var canvas = document.getElementById("canvas"),
 	ctx = canvas.getContext("2d"),
@@ -73,9 +75,9 @@ var boxes = [];
 //dimensions
 boxes.push({
 	x: 0,
-	y:0,
+	y:-100,
 	width: 10,
-	height: height,
+	height: height+100,
 });
 boxes.push({
 	x: 0,
@@ -85,13 +87,13 @@ boxes.push({
 });
 boxes.push({
 	x: width -10,
-	y: 0,
+	y: -100,
 	width: 50,
-	height:height,
+	height:height+100,
 });
-
+// platform level boxes
 boxes.push({
-	x: 45,
+	x: width - 110,
 	y: height-60,
 	width: 110,
 	height:10,
@@ -104,6 +106,54 @@ boxes.push({
 	height:10,
 });
 
+boxes.push({
+	x: 40,
+	y: height-225,
+	width: 260,
+	height:10,
+});
+boxes.push({
+	x: 290,
+	y: height-290,
+	width: 10,
+	height:70,
+});
+boxes.push({
+	x: width -300,
+	y: height-225,
+	width: 300,
+	height:10,
+});
+boxes.push({
+	x: 470,
+	y: height-425,
+	width: 70,
+	height:10,
+});
+boxes.push({
+	x: 400,
+	y: height-350,
+	width: 20,
+	height:10,
+});
+boxes.push({
+	x: 40,
+	y: 50,
+	width: 80,
+	height:10,
+});
+boxes.push({
+	x: 110,
+	y: 20,
+	width: 10,
+	height:30,
+});
+boxes.push({
+	x: 220,
+	y: 50,
+	width: 40,
+	height:10,
+});
 function update(){
 	// key input part
 	if(keys[38] || keys[87] || keys[32]) {
@@ -172,7 +222,7 @@ function update(){
 	ctx.fill();
 	// debug stuff
 	ctx.font = '10pt Calibri';
-	ctx.fillStyle = 'red';
+	ctx.fillStyle = 'white';
 	ctx.fillText("velX " +Math.round(player.velX * 100) / 100 , 20, 20);
 	ctx.fillText("velY " +Math.round(player.velY * 100) / 100 , 20, 40);
 	ctx.fillText("friction " +friction, 80, 20);
